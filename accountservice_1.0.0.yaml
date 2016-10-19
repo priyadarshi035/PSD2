@@ -1,0 +1,165 @@
+swagger: '2.0'
+info:
+  title: AccountService
+  description: ''
+  x-ibm-name: accountservice
+  version: 1.0.0
+schemes:
+  - https
+basePath: /AccountService
+produces:
+  - application/xml
+consumes:
+  - text/xml
+securityDefinitions:
+  clientID:
+    type: apiKey
+    name: X-IBM-Client-Id
+    in: header
+    description: ''
+security:
+  - clientID: []
+x-ibm-configuration:
+  type: wsdl
+  wsdl-definition:
+    wsdl: banka.wsdl
+    service: AccountService
+    port: AccountPort
+    soap-version: '1.1'
+  assembly:
+    execute:
+      - proxy:
+          title: proxy
+          target-url: 'http://banka.mybluemix.net/services/AccountService'
+  gateway: datapower-gateway
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+paths:
+  /getBalance:
+    post:
+      summary: Operation getBalance
+      description: ''
+      operationId: getBalance
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/getBalanceInput'
+      responses:
+        default:
+          description: ''
+          schema:
+            $ref: '#/definitions/getBalanceOutput'
+      x-ibm-soap:
+        soap-action: getBalance
+        soap-operation: '{http://bankA.sample.ibm.com/}getBalance'
+definitions:
+  wsSecurityHeader:
+    xml:
+      namespace: >-
+        http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd
+      prefix: wsse
+    type: object
+    properties:
+      UsernameToken:
+        type: object
+        properties:
+          Username:
+            type: string
+          Password:
+            type: string
+  getBalanceInput:
+    type: object
+    properties:
+      Envelope:
+        xml:
+          prefix: soap-env
+          namespace: 'http://schemas.xmlsoap.org/soap/envelope/'
+        type: object
+        properties:
+          Header:
+            $ref: '#/definitions/getBalanceHeader'
+          Body:
+            type: object
+            properties:
+              getBalance:
+                $ref: '#/definitions/getBalance'
+    example: >-
+
+      <soap-env:Envelope
+      xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
+       <soap-env:Header>
+        <wsse:wsSecurityHeader xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+         <wsse:UsernameToken>
+          <wsse:Username>string</wsse:Username>
+          <wsse:Password>string</wsse:Password>
+         </wsse:UsernameToken>
+        </wsse:wsSecurityHeader>
+       </soap-env:Header>
+       <soap-env:Body>
+        <tns:getBalance xmlns:tns="http://bankA.sample.ibm.com/">
+         <tns:arg0>3</tns:arg0>
+        </tns:getBalance>
+       </soap-env:Body>
+      </soap-env:Envelope>
+  getBalanceOutput:
+    type: object
+    properties:
+      Envelope:
+        xml:
+          prefix: soap-env
+          namespace: 'http://schemas.xmlsoap.org/soap/envelope/'
+        type: object
+        properties:
+          Body:
+            type: object
+            properties:
+              getBalanceResponse:
+                $ref: '#/definitions/getBalanceResponse'
+    example: >-
+
+      <soap-env:Envelope
+      xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
+       <soap-env:Body>
+        <tns:getBalanceResponse xmlns:tns="http://bankA.sample.ibm.com/">
+         <tns:return>3</tns:return>
+        </tns:getBalanceResponse>
+       </soap-env:Body>
+      </soap-env:Envelope>
+  getBalanceHeader:
+    type: object
+    properties:
+      wsSecurityHeader:
+        $ref: '#/definitions/wsSecurityHeader'
+  getBalance:
+    xml:
+      namespace: 'http://bankA.sample.ibm.com/'
+      prefix: tns
+    type: object
+    properties:
+      arg0:
+        type: integer
+        format: int32
+    example: |-
+
+      <tns:getBalance xmlns:tns="http://bankA.sample.ibm.com/">
+       <tns:arg0>3</tns:arg0>
+      </tns:getBalance>
+  getBalanceResponse:
+    xml:
+      namespace: 'http://bankA.sample.ibm.com/'
+      prefix: tns
+    type: object
+    properties:
+      return:
+        type: integer
+        format: int32
+    example: |-
+
+      <tns:getBalanceResponse xmlns:tns="http://bankA.sample.ibm.com/">
+       <tns:return>3</tns:return>
+      </tns:getBalanceResponse>
